@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.3
+- fixed the web support bug.
+
 ## 0.0.2
 - Fixed "No implementation found for this platform" error by removing default `HeicToImageImplementation` and ensuring explicit platform instantiation.
 

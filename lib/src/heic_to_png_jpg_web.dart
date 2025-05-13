@@ -30,7 +30,7 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
           js.context.callMethod('Uint8Array', [js.JsObject.jsify(heicData)]);
 
       // Create HeifDecoder
-      var decoder = js.context['libheif']['HeifDecoder'].new();
+      var decoder = js.JsObject(js.context['libheif']['HeifDecoder']);
 
       // Decode HEIC data
       var images = decoder.callMethod('decode', [jsHeicData]);
