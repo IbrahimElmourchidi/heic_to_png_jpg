@@ -7,13 +7,23 @@ import 'package:path_provider/path_provider.dart';
 
 import 'platform_interface.dart';
 
+// Factory function to create the platform implementation
+HeicToImagePlatform getPlatformImplementation() {
+  return HeicToPngJpgMobile();
+}
+
 class HeicToPngJpgMobile extends HeicToImagePlatform {
   @override
   Future<Uint8List> convertToImage({
     required Uint8List heicData,
     ImageFormat format = ImageFormat.jpg,
-    int quality = 90,
+    int quality = 80,
+    int? maxWidth,
   }) async {
+    // Debug: Log input size
+    print(
+        'Input HEIC size: ${(heicData.length / 1024 / 1024).toStringAsFixed(2)} MB');
+
     if (Platform.isIOS || Platform.isAndroid) {
       try {
         final tempDir = await getTemporaryDirectory();
@@ -37,20 +47,47 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
 
         // Read output data
         final outputFile = File(resultPath);
-        final Uint8List outputData = await outputFile.readAsBytes();
+        Uint8List outputData = await outputFile.readAsBytes();
 
         // Clean up temporary files
         await heicFile.delete();
         await outputFile.delete();
 
+        // Resize if maxWidth is specified
+        if (maxWidth != null) {
+          final image = img.decodeImage(outputData);
+          if (image == null) {
+            throw Exception('Failed to decode converted image for resizing');
+          }
+          if (maxWidth < image.width) {
+            final targetHeight =
+                (image.height * maxWidth / image.width).round();
+            final resizedImage = img.copyResize(
+              image,
+              width: maxWidth,
+              height: targetHeight,
+              interpolation: img.Interpolation.average,
+            );
+            outputData = format == ImageFormat.jpg
+                ? Uint8List.fromList(
+                    img.encodeJpg(resizedImage, quality: quality))
+                : Uint8List.fromList(img.encodePng(resizedImage));
+            print('Resized to: ${maxWidth}x$targetHeight');
+          }
+        }
+
+        // Debug: Log output size
+        print(
+            'Output ${format.name.toUpperCase()} size: ${(outputData.length / 1024 / 1024).toStringAsFixed(2)} MB');
+
         return outputData;
       } catch (e) {
         // Fallback to Dart implementation if heif_converter fails
-        return _convertUsingDart(heicData, format, quality);
+        return _convertUsingDart(heicData, format, quality, maxWidth);
       }
     } else {
       // Fallback to Dart implementation for other platforms
-      return _convertUsingDart(heicData, format, quality);
+      return _convertUsingDart(heicData, format, quality, maxWidth);
     }
   }
 
@@ -58,23 +95,48 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
     Uint8List heicData,
     ImageFormat format,
     int quality,
+    int? maxWidth,
   ) async {
     try {
-      // Try to decode HEIC using the image package
+      // Debug: Log fallback usage
+      print('Using Dart fallback for HEIC conversion');
+
+      // Decode HEIC using the image package
       final image = img.decodeImage(heicData);
-
       if (image == null) {
-        throw Exception('Failed to decode image');
+        throw Exception('Failed to decode HEIC image');
       }
 
-      // Encode as JPG or PNG based on format
-      if (format == ImageFormat.jpg) {
-        final jpgData = img.encodeJpg(image, quality: quality);
-        return Uint8List.fromList(jpgData);
-      } else {
-        final pngData = img.encodePng(image);
-        return Uint8List.fromList(pngData);
+      // Resize if maxWidth is specified
+      img.Image outputImage = image;
+      if (maxWidth != null && maxWidth < image.width) {
+        final targetHeight = (image.height * maxWidth / image.width).round();
+        outputImage = img.copyResize(
+          image,
+          width: maxWidth,
+          height: targetHeight,
+          interpolation: img.Interpolation.average,
+        );
+        print('Resized to: ${maxWidth}x$targetHeight');
       }
+
+      // Encode to JPG or PNG
+      final Uint8List outputData;
+      if (format == ImageFormat.jpg) {
+        outputData = Uint8List.fromList(
+          img.encodeJpg(outputImage, quality: quality),
+        );
+      } else {
+        outputData = Uint8List.fromList(
+          img.encodePng(outputImage),
+        );
+      }
+
+      // Debug: Log output size
+      print(
+          'Output ${format.name.toUpperCase()} size: ${(outputData.length / 1024 / 1024).toStringAsFixed(2)} MB');
+
+      return outputData;
     } catch (e) {
       throw Exception(
           'Failed to convert HEIC to ${format.name.toUpperCase()}: $e');

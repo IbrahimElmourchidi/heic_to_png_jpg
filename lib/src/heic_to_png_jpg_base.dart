@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:heic_to_png_jpg/src/heic_to_png_jpg_mobile.dart';
 
 import 'platform_interface.dart';
+
+// Import implementations conditionally
+// This is the proper way to do conditional imports
 import 'heic_to_png_jpg_web.dart'
-    if (dart.library.io) 'heic_to_png_jpg_mobile.dart';
+    if (dart.library.io) 'heic_to_png_jpg_mobile.dart' as implementation;
 
 class HeicConverter {
   static Future<Uint8List> convertToJPG({
@@ -33,12 +35,9 @@ class HeicConverter {
     ImageFormat format = ImageFormat.jpg,
     int quality = 90,
   }) async {
-    // Set the platform implementation
-    if (kIsWeb) {
-      HeicToImagePlatform.instance = HeicToPngJpgWeb();
-    } else {
-      HeicToImagePlatform.instance = HeicToPngJpgMobile();
-    }
+    // Use the properly imported implementation
+    // Let the implementation decide which platform-specific code to run
+    HeicToImagePlatform.instance = implementation.getPlatformImplementation();
 
     return HeicToImagePlatform.instance.convertToImage(
       heicData: heicData,

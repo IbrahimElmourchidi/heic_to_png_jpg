@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.4
+- fixed the web support bug.
+
 ## 0.0.3
 - fixed the web support bug.
 
