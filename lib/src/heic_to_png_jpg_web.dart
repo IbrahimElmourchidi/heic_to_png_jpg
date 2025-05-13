@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:typed_data';
-import 'dart:js' as js;
-import 'dart:html' as html;
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'dart:convert';
+import 'dart:html' as html;
+import 'dart:js' as js;
+import 'dart:typed_data';
+
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'platform_interface.dart';
 

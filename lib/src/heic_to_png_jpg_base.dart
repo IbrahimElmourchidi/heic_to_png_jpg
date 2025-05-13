@@ -1,13 +1,11 @@
-import 'dart:typed_data';
 import 'dart:async';
-import 'package:flutter/foundation.dart' show kIsWeb;
-
-import 'platform_interface.dart';
+import 'dart:typed_data';
 
 // Import implementations conditionally
 // This is the proper way to do conditional imports
 import 'heic_to_png_jpg_web.dart'
     if (dart.library.io) 'heic_to_png_jpg_mobile.dart' as implementation;
+import 'platform_interface.dart';
 
 class HeicConverter {
   static Future<Uint8List> convertToJPG({

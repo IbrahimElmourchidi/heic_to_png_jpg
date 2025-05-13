@@ -21,8 +21,6 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
     int? maxWidth,
   }) async {
     // Debug: Log input size
-    print(
-        'Input HEIC size: ${(heicData.length / 1024 / 1024).toStringAsFixed(2)} MB');
 
     if (Platform.isIOS || Platform.isAndroid) {
       try {
@@ -72,13 +70,8 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
                 ? Uint8List.fromList(
                     img.encodeJpg(resizedImage, quality: quality))
                 : Uint8List.fromList(img.encodePng(resizedImage));
-            print('Resized to: ${maxWidth}x$targetHeight');
           }
         }
-
-        // Debug: Log output size
-        print(
-            'Output ${format.name.toUpperCase()} size: ${(outputData.length / 1024 / 1024).toStringAsFixed(2)} MB');
 
         return outputData;
       } catch (e) {
@@ -99,7 +92,6 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
   ) async {
     try {
       // Debug: Log fallback usage
-      print('Using Dart fallback for HEIC conversion');
 
       // Decode HEIC using the image package
       final image = img.decodeImage(heicData);
@@ -117,7 +109,6 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
           height: targetHeight,
           interpolation: img.Interpolation.average,
         );
-        print('Resized to: ${maxWidth}x$targetHeight');
       }
 
       // Encode to JPG or PNG
@@ -131,10 +122,6 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
           img.encodePng(outputImage),
         );
       }
-
-      // Debug: Log output size
-      print(
-          'Output ${format.name.toUpperCase()} size: ${(outputData.length / 1024 / 1024).toStringAsFixed(2)} MB');
 
       return outputData;
     } catch (e) {
