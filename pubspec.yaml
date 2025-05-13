@@ -17,6 +17,7 @@ dependencies:
   image: ^4.0.15
   heif_converter: ^1.0.1
   path_provider: ^2.0.14
+  plugin_platform_interface: ^2.1.4
 
 dev_dependencies:
   flutter_test:
