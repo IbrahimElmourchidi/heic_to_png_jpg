@@ -10,7 +10,7 @@ abstract class HeicToImagePlatform extends PlatformInterface {
   HeicToImagePlatform() : super(token: _token);
 
   static final Object _token = Object();
-  static HeicToImagePlatform _instance = HeicToImageImplementation();
+  static late HeicToImagePlatform _instance;
 
   static HeicToImagePlatform get instance => _instance;
 
@@ -23,18 +23,5 @@ abstract class HeicToImagePlatform extends PlatformInterface {
     required Uint8List heicData,
     ImageFormat format = ImageFormat.jpg,
     int quality = 90,
-  }) {
-    throw UnimplementedError('convertToImage has not been implemented.');
-  }
-}
-
-class HeicToImageImplementation extends HeicToImagePlatform {
-  @override
-  Future<Uint8List> convertToImage({
-    required Uint8List heicData,
-    ImageFormat format = ImageFormat.jpg,
-    int quality = 90,
-  }) async {
-    throw UnimplementedError('No implementation found for this platform');
-  }
+  });
 }
