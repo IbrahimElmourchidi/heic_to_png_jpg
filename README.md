@@ -28,11 +28,7 @@ flutter pub get
 
 ### Web Setup
 
-For web support, add the following script to your `web/index.html`:
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/libheif-js@1.18.2/libheif/libheif.min.js"></script>
-```
+For web support, no need to add anything to `web/index.html` the package takes car of it for you.
 
 ## Usage
 
@@ -80,7 +76,7 @@ Future<Uint8List> convertHeicToJpg(Uint8List heicData, int quality) async {
 ## Notes
 
 - **Mobile**: Uses the `heif_converter` package for iOS and Android, which requires temporary file operations.
-- **Web**: Uses the `libheif-js` package, it auto loads it the background no need to add it to index.html. 
+- **Web**: Uses the `libheif-js` package, it auto loads it the background no need to add it to `web/index.html`. 
 - **Fallback**: If `heif_converter` fails or is unsupported, the package falls back to the `image` package, which may have limited HEIC support.
 
 ## Issues and Contributions
