@@ -4,8 +4,8 @@ import 'dart:typed_data';
 import 'package:heic_to_png_jpg/src/image_format.dart';
 
 // Conditional import using js_interop for web per package:web guidance
-import 'heic_to_png_jpg_mobile.dart' if (dart.library.js_interop) 'heic_to_png_jpg_web.dart'
-    as implementation;
+import 'heic_to_png_jpg_mobile.dart'
+    if (dart.library.js_interop) 'heic_to_png_jpg_web.dart' as implementation;
 import 'platform_interface.dart';
 
 class HeicConverter {

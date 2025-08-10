@@ -63,7 +63,8 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
             throw Exception('Failed to decode converted image for resizing');
           }
           if (maxWidth < image.width) {
-            final targetHeight = (image.height * maxWidth / image.width).round();
+            final targetHeight =
+                (image.height * maxWidth / image.width).round();
             final resizedImage = img.copyResize(
               image,
               width: maxWidth,
@@ -71,7 +72,8 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
               interpolation: img.Interpolation.average,
             );
             outputData = format == ImageFormat.jpg
-                ? Uint8List.fromList(img.encodeJpg(resizedImage, quality: quality))
+                ? Uint8List.fromList(
+                    img.encodeJpg(resizedImage, quality: quality))
                 : Uint8List.fromList(img.encodePng(resizedImage));
           }
         }
@@ -128,7 +130,8 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
 
       return outputData;
     } catch (e) {
-      throw Exception('Failed to convert HEIC to ${format.name.toUpperCase()}: $e');
+      throw Exception(
+          'Failed to convert HEIC to ${format.name.toUpperCase()}: $e');
     }
   }
 }

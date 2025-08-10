@@ -10,7 +10,8 @@ abstract class HeicToImagePlatform extends PlatformInterface {
   static HeicToImagePlatform? _instance;
 
   static HeicToImagePlatform get instance {
-    return _instance ??= throw Exception('HeicToImagePlatform instance not set');
+    return _instance ??=
+        throw Exception('HeicToImagePlatform instance not set');
   }
 
   static set instance(HeicToImagePlatform? instance) {

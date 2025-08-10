@@ -69,7 +69,8 @@ class _MyHomePageState extends State<MyHomePage> {
       if (result != null && result.files.single.bytes != null) {
         _heicData = result.files.single.bytes!;
         _convertedData = null;
-        _status = 'Loaded HEIC (${(_heicData!.length / (1024 * 1024)).toStringAsFixed(2)} MB)';
+        _status =
+            'Loaded HEIC (${(_heicData!.length / (1024 * 1024)).toStringAsFixed(2)} MB)';
       } else {
         _status = 'No file selected';
       }
@@ -94,10 +95,12 @@ class _MyHomePageState extends State<MyHomePage> {
       _status = 'Converting to PNG...';
     });
     try {
-      final output = await HeicConverter.convertToPNG(heicData: _heicData!, maxWidth: _maxWidth);
+      final output = await HeicConverter.convertToPNG(
+          heicData: _heicData!, maxWidth: _maxWidth);
       setState(() {
         _convertedData = output;
-        _status = 'Converted to PNG (${(output.length / (1024 * 1024)).toStringAsFixed(2)} MB)';
+        _status =
+            'Converted to PNG (${(output.length / (1024 * 1024)).toStringAsFixed(2)} MB)';
       });
     } catch (e) {
       setState(() {
@@ -129,7 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       setState(() {
         _convertedData = output;
-        _status = 'Converted to JPG (${(output.length / (1024 * 1024)).toStringAsFixed(2)} MB)';
+        _status =
+            'Converted to JPG (${(output.length / (1024 * 1024)).toStringAsFixed(2)} MB)';
       });
     } catch (e) {
       setState(() {
@@ -188,7 +192,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Quality (only for JPG) ${_quality.toStringAsFixed(0)}%'),
+                      Text(
+                          'Quality (only for JPG) ${_quality.toStringAsFixed(0)}%'),
                       Slider(
                         value: _quality.toDouble(),
                         min: 0,
@@ -224,7 +229,8 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 16),
             Expanded(
               child: Container(
-                decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300)),
                 child: image == null
                     ? const Center(child: Text('No image loaded'))
                     : Image.memory(image, fit: BoxFit.contain),

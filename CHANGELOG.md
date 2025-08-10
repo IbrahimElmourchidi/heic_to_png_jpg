@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0
+## 0.0.5
 - Moved web implementation to `package:web` and `dart:js_interop` to support wasm compilations.
 - The plugin handles loading the `libheif-bundle.js` itself, no longer do you need to add it manually to your index.html.
 - You can provide a different libheif js version in the convertors e.g. 
