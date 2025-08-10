@@ -94,7 +94,8 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
       final width = image.getWidth();
       final height = image.getHeight();
       if (width <= 0 || height <= 0) {
-        throw Exception('Invalid image dimensions: width=$width, height=$height');
+        throw Exception(
+            'Invalid image dimensions: width=$width, height=$height');
       }
 
       // Calculate target dimensions for resizing (if maxWidth is specified)
@@ -123,7 +124,8 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
 
       void displayCallback(JSObject? displayData) {
         if (displayData == null) {
-          completer.completeError(Exception('HEIF processing error: display returned null'));
+          completer.completeError(
+              Exception('HEIF processing error: display returned null'));
         } else {
           completer.complete();
         }
@@ -143,15 +145,16 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
         tempContext.putImageData(imageData, 0, 0);
 
         // Draw the temporary canvas onto the resized canvas
-        context.drawImageScaled(tempCanvas, 0, 0, targetWidth.toDouble(), targetHeight.toDouble());
+        context.drawImageScaled(
+            tempCanvas, 0, 0, targetWidth.toDouble(), targetHeight.toDouble());
       } else {
         context.putImageData(imageData, 0, 0);
       }
 
       // Convert to PNG or JPG
       final mimeType = format == ImageFormat.jpg ? 'image/jpeg' : 'image/png';
-      final dataUrl =
-          canvas.toDataUrl(mimeType, format == ImageFormat.jpg ? quality / 100.0 : null);
+      final dataUrl = canvas.toDataUrl(
+          mimeType, format == ImageFormat.jpg ? quality / 100.0 : null);
 
       // Extract base64 data
       final base64 = dataUrl.split(',').last;
@@ -165,7 +168,8 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
 
       return outputData;
     } catch (e) {
-      throw Exception('Failed to convert HEIC to ${format.name.toUpperCase()}: $e');
+      throw Exception(
+          'Failed to convert HEIC to ${format.name.toUpperCase()}: $e');
     }
   }
 

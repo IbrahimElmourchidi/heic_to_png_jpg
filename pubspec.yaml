@@ -1,6 +1,6 @@
 name: heic_to_png_jpg
 description: A Flutter package to convert HEIC images to JPG or PNG format on both web and mobile platforms.
-version: 0.1.0
+version: 0.0.5
 homepage: https://github.com/IbrahimElmourchidi/heic_to_png_jpg
 repository: https://github.com/IbrahimElmourchidi/heic_to_png_jpg
 

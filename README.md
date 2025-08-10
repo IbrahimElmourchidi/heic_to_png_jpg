@@ -81,7 +81,7 @@ Future<Uint8List> convertHeicToJpg(Uint8List heicData, int quality) async {
 
 ## Issues and Contributions
 
-Please file any issues, bugs, or feature requests on our [GitHub](https://github.com/utanium/heic_to_png_jpg) page.
+Please file any issues, bugs, or feature requests on our [GitHub](https://github.com/IbrahimElmourchidi/heic_to_png_jpg/tree/main) page.
 
 ## License
 
