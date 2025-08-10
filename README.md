@@ -80,7 +80,7 @@ Future<Uint8List> convertHeicToJpg(Uint8List heicData, int quality) async {
 ## Notes
 
 - **Mobile**: Uses the `heif_converter` package for iOS and Android, which requires temporary file operations.
-- **Web**: Requires the `libheif-js` script in `index.html` for HEIC decoding.
+- **Web**: Uses the `libheif-js` package, it auto loads it the background no need to add it to index.html. 
 - **Fallback**: If `heif_converter` fails or is unsupported, the package falls back to the `image` package, which may have limited HEIC support.
 
 ## Issues and Contributions

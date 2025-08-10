@@ -1,6 +1,8 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:heic_to_png_jpg/src/image_format.dart';
 import 'package:heif_converter/heif_converter.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
@@ -19,6 +21,9 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
     ImageFormat format = ImageFormat.jpg,
     int quality = 80,
     int? maxWidth,
+
+    /// It's not used in mobile platform.
+    String? libheifJsUrl,
   }) async {
     // Debug: Log input size
 
@@ -58,8 +63,7 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
             throw Exception('Failed to decode converted image for resizing');
           }
           if (maxWidth < image.width) {
-            final targetHeight =
-                (image.height * maxWidth / image.width).round();
+            final targetHeight = (image.height * maxWidth / image.width).round();
             final resizedImage = img.copyResize(
               image,
               width: maxWidth,
@@ -67,8 +71,7 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
               interpolation: img.Interpolation.average,
             );
             outputData = format == ImageFormat.jpg
-                ? Uint8List.fromList(
-                    img.encodeJpg(resizedImage, quality: quality))
+                ? Uint8List.fromList(img.encodeJpg(resizedImage, quality: quality))
                 : Uint8List.fromList(img.encodePng(resizedImage));
           }
         }
@@ -125,8 +128,7 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
 
       return outputData;
     } catch (e) {
-      throw Exception(
-          'Failed to convert HEIC to ${format.name.toUpperCase()}: $e');
+      throw Exception('Failed to convert HEIC to ${format.name.toUpperCase()}: $e');
     }
   }
 }

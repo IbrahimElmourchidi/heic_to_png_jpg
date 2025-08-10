@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.0
+- Moved web implementation to `package:web` and `dart:js_interop` to support wasm compilations.
+- The plugin handles loading the `libheif-bundle.js` itself, no longer do you need to add it manually to your index.html.
+- You can provide a different libheif js version in the convertors e.g. 
+```dart
+final output = await HeicConverter.convertToPNG(
+    heicData: heicData, 
+    maxWidth: maxWidth, 
+    libheifJsUrl:'https://cdn.jsdelivr.net/npm/libheif-js@1.19.8/libheif-wasm/libheif-bundle.js',
+);
+```
+
 ## 0.0.4
 - fixed the web support bug.
 
