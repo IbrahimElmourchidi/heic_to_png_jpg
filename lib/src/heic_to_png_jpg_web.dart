@@ -14,6 +14,8 @@ import 'platform_interface.dart';
 @JS('libheif')
 external JSObject libheif();
 
+extension type LibheifModule._(JSObject _) implements JSObject {}
+
 @JS('libheifModule.HeifImage')
 extension type HeifImage._(JSObject _) implements JSObject {
   external HeifImage();
@@ -168,7 +170,7 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
   }
 
   bool _isLibheifAvailable() {
-    final available = web.window.hasProperty('libheifModule'.toJS);
+    final available = globalContext.hasProperty('libheifModule'.toJS);
     log('libheif available: $available');
     if (available.toDart) {
       log('libheif object (pre-init): ${web.window['libheifModule']}');
@@ -176,7 +178,7 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
     return available.toDart;
   }
 
-  Future<void> _loadScript(String url) {
+  Future<void> _loadScript(String url) async {
     final script = web.HTMLScriptElement();
     script.type = 'application/javascript';
     script.src = url;
@@ -187,7 +189,7 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
     script.addEventListener(
         'load',
         (web.Event _) {
-          web.window['libheifModule'] = libheif();
+          globalContext['libheifModule'] = libheif();
           completer.complete();
         }.toJS);
 

@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  web: ^0.5.1
+  web: ^1.1.1
   image: ^4.0.15
   heif_converter: ^1.0.1
   path_provider: ^2.0.14
