@@ -19,7 +19,7 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
   Future<Uint8List> convertToImage({
     required Uint8List heicData,
     ImageFormat format = ImageFormat.jpg,
-    int quality = 80,
+    int quality = 100,
     int? maxWidth,
 
     /// It's not used in mobile platform.
@@ -56,26 +56,35 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
         await heicFile.delete();
         await outputFile.delete();
 
-        // Resize if maxWidth is specified
-        if (maxWidth != null) {
+        // Apply quality or resize if needed
+        bool needsProcessing =
+            (maxWidth != null) || (format == ImageFormat.jpg && quality != 100);
+
+        if (needsProcessing) {
           final image = img.decodeImage(outputData);
           if (image == null) {
-            throw Exception('Failed to decode converted image for resizing');
+            throw Exception('Failed to decode converted image for processing');
           }
-          if (maxWidth < image.width) {
+
+          img.Image processedImage = image;
+
+          // Resize if maxWidth is specified and image is larger
+          if (maxWidth != null && maxWidth < image.width) {
             final targetHeight =
                 (image.height * maxWidth / image.width).round();
-            final resizedImage = img.copyResize(
+            processedImage = img.copyResize(
               image,
               width: maxWidth,
               height: targetHeight,
               interpolation: img.Interpolation.average,
             );
-            outputData = format == ImageFormat.jpg
-                ? Uint8List.fromList(
-                    img.encodeJpg(resizedImage, quality: quality))
-                : Uint8List.fromList(img.encodePng(resizedImage));
           }
+
+          // Re-encode with quality setting
+          outputData = format == ImageFormat.jpg
+              ? Uint8List.fromList(
+                  img.encodeJpg(processedImage, quality: quality))
+              : Uint8List.fromList(img.encodePng(processedImage));
         }
 
         return outputData;

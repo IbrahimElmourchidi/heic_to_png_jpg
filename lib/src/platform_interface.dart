@@ -24,7 +24,7 @@ abstract class HeicToImagePlatform extends PlatformInterface {
   Future<Uint8List> convertToImage({
     required Uint8List heicData,
     ImageFormat format = ImageFormat.jpg,
-    int quality = 80,
+    int quality = 100,
     int? maxWidth,
 
     /// To override the default libheif js cdn url.

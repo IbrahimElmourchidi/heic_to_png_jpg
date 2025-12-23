@@ -11,7 +11,7 @@ import 'platform_interface.dart';
 class HeicConverter {
   static Future<Uint8List> convertToJPG({
     required Uint8List heicData,
-    int quality = 90,
+    int quality = 100,
     int? maxWidth,
 
     /// To override the default libheif js cdn url.
@@ -44,7 +44,7 @@ class HeicConverter {
   static Future<Uint8List> convertToImage({
     required Uint8List heicData,
     ImageFormat format = ImageFormat.jpg,
-    int quality = 90,
+    int quality = 100,
     int? maxWidth,
 
     /// To override the default libheif js cdn url.

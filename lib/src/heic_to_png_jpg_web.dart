@@ -62,7 +62,7 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
   Future<Uint8List> convertToImage({
     required Uint8List heicData,
     ImageFormat format = ImageFormat.jpg,
-    int quality = 80,
+    int quality = 100,
     int? maxWidth,
     String? libheifJsUrl,
   }) async {

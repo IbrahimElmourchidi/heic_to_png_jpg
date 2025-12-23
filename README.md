@@ -86,3 +86,37 @@ Please file any issues, bugs, or feature requests on our [GitHub](https://github
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 About the Author
+
+<div align="center">
+<a href="https://github.com/IbrahimElmourchidi">
+<img src="https://github.com/IbrahimElmourchidi.png" width="80" alt="Ibrahim El Mourchidi" style="border-radius: 50%;">
+</a>
+<h3>Ibrahim El Mourchidi</h3>
+<p>Flutter & Firebase Developer • Cairo, Egypt</p>
+<p>
+<a href="https://github.com/IbrahimElmourchidi">
+<img src="https://img.shields.io/github/followers/IbrahimElmourchidi?label=Follow&style=social" alt="GitHub Follow">
+</a>
+<a href="mailto:ibrahimelmourchidi@gmail.com">
+<img src="https://img.shields.io/badge/Email-D14836?logo=gmail&logoColor=white" alt="Email">
+</a>
+<a href="https://www.linkedin.com/in/IbrahimElmourchidi">
+<img src="https://img.shields.io/badge/LinkedIn-Profile-blue?style=flat&logo=linkedin" alt="LinkedIn Profile">
+</a>
+</p>
+</div>
+
+- 🔹 Top-rated Flutter freelancer (100% Job Success on [Upwork](https://www.upwork.com/freelancers/~0105391a1bbefa5522))
+- 🔹 Built 20+ production apps with real-time & payment features
+- 🔹 Passionate about clean architecture, compliance, and UX
+
+---
+
+
+👥 Contributors
+We appreciate all contributions to this project! <br><br>
+<a href="https://github.com/IbrahimElmourchidi/heic_to_png_jpg/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=IbrahimElmourchidi/heic_to_png_jpg" />
+</a>

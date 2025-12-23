@@ -1,4 +1,28 @@
 # Changelog
+## [0.0.6] - 2024-12-23
+
+### Changed
+- **BREAKING**: Default quality increased from 80 to 100 for maximum quality output
+- Quality parameter now applies correctly even when `maxWidth` is not specified
+- Optimized conversion process to avoid unnecessary re-encoding when quality is 100% (default)
+
+### Fixed
+- Fixed issue where quality parameter was only applied during image resizing
+- Fixed quality not being respected when converting without resizing
+- Improved image quality preservation in all conversion scenarios
+
+### Improved
+- Better performance: Skip re-encoding when using default quality (100%) and no resizing
+- More efficient memory usage by avoiding decode/encode cycles when not needed
+- Enhanced quality control consistency across different conversion paths
+
+### Technical Details
+- Added smart processing detection: only re-encodes when quality < 100 or resizing is needed
+- Maintained backward compatibility with existing API
+- Quality parameter now works as expected in all scenarios:
+  - Converting without resizing (previously ignored)
+  - Converting with resizing (previously worked)
+  - Converting with custom quality settings
 
 ## 0.0.5
 - Moved web implementation to `package:web` and `dart:js_interop` to support wasm compilations.
