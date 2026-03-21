@@ -26,6 +26,7 @@ abstract class HeicToImagePlatform extends PlatformInterface {
     ImageFormat format = ImageFormat.jpg,
     int quality = 100,
     int? maxWidth,
+    int? maxHeight,
 
     /// To override the default libheif js cdn url.
     String? libheifJsUrl,

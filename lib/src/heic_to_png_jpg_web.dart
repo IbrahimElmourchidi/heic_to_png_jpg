@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 import 'dart:typed_data';
@@ -9,6 +8,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:heic_to_png_jpg/src/image_format.dart';
 import 'package:web/web.dart' as web;
 
+import 'exceptions.dart';
 import 'platform_interface.dart';
 
 @JS('libheif')
@@ -64,47 +64,60 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
     ImageFormat format = ImageFormat.jpg,
     int quality = 100,
     int? maxWidth,
+    int? maxHeight,
     String? libheifJsUrl,
   }) async {
+    // Validate quality
+    if (quality < 0 || quality > 100) {
+      throw InvalidHeicDataException(
+          'quality must be between 0 and 100, got $quality');
+    }
+
     if (!_isLibheifAvailable()) {
       try {
         await _loadScript(libheifJsUrl ?? defaultLibheifUrl);
       } catch (e) {
-        throw Exception("libheif-js not found. Ensure you've included "
+        throw ConversionFailedException(
+            "libheif-js not found. Ensure you've included "
             "<script src='${libheifJsUrl ?? defaultLibheifUrl}'></script> "
             "in your index.html");
       }
     }
 
     try {
-      // Debug: Log input size
-      log('Input HEIC size: ${(heicData.length / 1024 / 1024).toStringAsFixed(2)} MB');
-
-      // Initialize libheif if it's a function (WebAssembly module constructor)
       HeifDecoder libheifInstance = HeifDecoder();
       final images = libheifInstance.decode(heicData.toJS);
 
       if (images.toDart.isEmpty) {
-        throw Exception('No valid images found in HEIC file');
+        throw const ConversionFailedException('No valid images found in HEIC file');
       }
 
-      // Use the first image
       final image = images[0];
-      // Get image dimensions
       final width = image.getWidth();
       final height = image.getHeight();
       if (width <= 0 || height <= 0) {
-        throw Exception(
+        throw ConversionFailedException(
             'Invalid image dimensions: width=$width, height=$height');
       }
 
-      // Calculate target dimensions for resizing (if maxWidth is specified)
+      // Calculate target dimensions (contain mode when both are set)
       int targetWidth = width;
       int targetHeight = height;
-      if (maxWidth != null && maxWidth < width) {
+
+      if (maxWidth != null && maxHeight != null) {
+        final scaleW = maxWidth / width;
+        final scaleH = maxHeight / height;
+        final scale = scaleW < scaleH ? scaleW : scaleH;
+        if (scale < 1.0) {
+          targetWidth = (width * scale).round();
+          targetHeight = (height * scale).round();
+        }
+      } else if (maxWidth != null && maxWidth < width) {
         targetWidth = maxWidth;
         targetHeight = (height * maxWidth / width).round();
-        log('Resizing to: ${targetWidth}x$targetHeight');
+      } else if (maxHeight != null && maxHeight < height) {
+        targetHeight = maxHeight;
+        targetWidth = (width * maxHeight / height).round();
       }
 
       // Create canvas with target dimensions
@@ -113,7 +126,7 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
       canvas.height = targetHeight;
       final context = canvas.getContext('2d') as web.CanvasRenderingContext2D?;
       if (context == null) {
-        throw Exception('Failed to get canvas context');
+        throw const ConversionFailedException('Failed to get canvas context');
       }
 
       // Create image data for the original dimensions
@@ -125,7 +138,7 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
       void displayCallback(JSObject? displayData) {
         if (displayData == null) {
           completer.completeError(
-              Exception('HEIF processing error: display returned null'));
+              const ConversionFailedException('HEIF processing error: display returned null'));
         } else {
           completer.complete();
         }
@@ -137,49 +150,50 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
 
       // Draw image data on canvas (resize if needed)
       if (targetWidth != width || targetHeight != height) {
-        // Create a temporary canvas for the original image
         final tempCanvas = web.HTMLCanvasElement();
         tempCanvas.width = width;
         tempCanvas.height = height;
         final tempContext = tempCanvas.context2D;
         tempContext.putImageData(imageData, 0, 0);
 
-        // Draw the temporary canvas onto the resized canvas
-        context.drawImageScaled(
+        context.drawImage(
             tempCanvas, 0, 0, targetWidth.toDouble(), targetHeight.toDouble());
       } else {
         context.putImageData(imageData, 0, 0);
       }
 
-      // Convert to PNG or JPG
-      final mimeType = format == ImageFormat.jpg ? 'image/jpeg' : 'image/png';
-      final dataUrl = canvas.toDataUrl(
-          mimeType, format == ImageFormat.jpg ? quality / 100.0 : null);
+      // Convert to target format
+      final String mimeType;
+      final num? qualityArg;
+      switch (format) {
+        case ImageFormat.jpg:
+          mimeType = 'image/jpeg';
+          qualityArg = quality / 100.0;
+        case ImageFormat.png:
+          mimeType = 'image/png';
+          qualityArg = null;
+        case ImageFormat.webp:
+          mimeType = 'image/webp';
+          qualityArg = quality / 100.0;
+      }
 
-      // Extract base64 data
+      final dataUrl = canvas.toDataUrl(mimeType, qualityArg);
       final base64 = dataUrl.split(',').last;
       final outputData = base64Decode(base64);
 
-      // Debug: Log output size
-      log('Output ${format.name.toUpperCase()} size: ${(outputData.length / 1024 / 1024).toStringAsFixed(2)} MB');
-
-      // Free the image handle if free method exists
       image.free();
 
       return outputData;
+    } on HeicConversionException {
+      rethrow;
     } catch (e) {
-      throw Exception(
-          'Failed to convert HEIC to ${format.name.toUpperCase()}: $e');
+      throw ConversionFailedException(
+          'Failed to convert HEIC to ${format.name.toUpperCase()}', cause: e);
     }
   }
 
   bool _isLibheifAvailable() {
-    final available = globalContext.hasProperty('libheifModule'.toJS);
-    log('libheif available: $available');
-    if (available.toDart) {
-      log('libheif object (pre-init): ${web.window['libheifModule']}');
-    }
-    return available.toDart;
+    return globalContext.hasProperty('libheifModule'.toJS).toDart;
   }
 
   Future<void> _loadScript(String url) async {
@@ -200,7 +214,8 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
     script.addEventListener(
         'error',
         (web.Event _) {
-          completer.completeError(Exception('Failed to load script: $url'));
+          completer.completeError(
+              ConversionFailedException('Failed to load script: $url'));
         }.toJS);
 
     web.document.head!.append(script);
