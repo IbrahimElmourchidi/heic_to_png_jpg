@@ -9,6 +9,7 @@ import 'package:heic_to_png_jpg/src/image_format.dart';
 import 'package:web/web.dart' as web;
 
 import 'exceptions.dart';
+import 'heic_image_info.dart';
 import 'platform_interface.dart';
 
 @JS('libheif')
@@ -190,6 +191,53 @@ class HeicToPngJpgWeb extends HeicToImagePlatform {
       throw ConversionFailedException(
           'Failed to convert HEIC to ${format.name.toUpperCase()}', cause: e);
     }
+  }
+
+  @override
+  Future<HeicImageInfo> getImageInfo(Uint8List heicData) async {
+    if (!_isLibheifAvailable()) {
+      try {
+        await _loadScript(defaultLibheifUrl);
+      } catch (e) {
+        throw const ConversionFailedException(
+            "libheif-js not found. Ensure you've included the libheif-js "
+            "script in your index.html");
+      }
+    }
+
+    try {
+      final decoder = HeifDecoder();
+      final images = decoder.decode(heicData.toJS);
+
+      if (images.toDart.isEmpty) {
+        throw const ConversionFailedException('No valid images found in HEIC file');
+      }
+
+      final image = images[0];
+      final width = image.getWidth();
+      final height = image.getHeight();
+      image.free();
+
+      return HeicImageInfo(width: width, height: height);
+    } on HeicConversionException {
+      rethrow;
+    } catch (e) {
+      throw ConversionFailedException(
+          'Failed to get HEIC image info', cause: e);
+    }
+  }
+
+  @override
+  Future<String> convertFile({
+    required String inputPath,
+    String? outputPath,
+    ImageFormat format = ImageFormat.jpg,
+    int quality = 100,
+    int? maxWidth,
+    int? maxHeight,
+  }) async {
+    throw const PlatformNotSupportedException(
+        'convertFile is not supported on web. Use convertToImage with Uint8List data instead.');
   }
 
   bool _isLibheifAvailable() {

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:heic_to_png_jpg/src/image_format.dart';
@@ -8,6 +9,7 @@ import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 
 import 'exceptions.dart';
+import 'heic_image_info.dart';
 import 'platform_interface.dart';
 
 // Factory function to create the platform implementation
@@ -176,6 +178,50 @@ class HeicToPngJpgMobile extends HeicToImagePlatform {
         // closest equivalent. Web platform uses native canvas WebP.
         return Uint8List.fromList(img.encodePng(image));
     }
+  }
+
+  @override
+  Future<HeicImageInfo> getImageInfo(Uint8List heicData) async {
+    final result = await Isolate.run(() {
+      final image = img.decodeImage(heicData);
+      if (image == null) {
+        throw const ConversionFailedException('Failed to decode HEIC image for info');
+      }
+      return (width: image.width, height: image.height);
+    });
+    return HeicImageInfo(width: result.width, height: result.height);
+  }
+
+  @override
+  Future<String> convertFile({
+    required String inputPath,
+    String? outputPath,
+    ImageFormat format = ImageFormat.jpg,
+    int quality = 100,
+    int? maxWidth,
+    int? maxHeight,
+  }) async {
+    final heicData = await File(inputPath).readAsBytes();
+
+    final outputData = await convertToImage(
+      heicData: heicData,
+      format: format,
+      quality: quality,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+    );
+
+    final String resolvedOutputPath;
+    if (outputPath != null) {
+      resolvedOutputPath = outputPath;
+    } else {
+      final tempDir = await getTemporaryDirectory();
+      final id = DateTime.now().microsecondsSinceEpoch;
+      resolvedOutputPath = '${tempDir.path}/heic_$id.${format.name}';
+    }
+
+    await File(resolvedOutputPath).writeAsBytes(outputData);
+    return resolvedOutputPath;
   }
 
   Future<void> _deleteIfExists(File file) async {

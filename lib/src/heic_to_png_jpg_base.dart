@@ -1,16 +1,11 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:heic_to_png_jpg/src/image_format.dart';
-import 'package:image/image.dart' as img;
-import 'package:path_provider/path_provider.dart';
 
 // Conditional import using js_interop for web per package:web guidance
 import 'heic_to_png_jpg_mobile.dart'
     if (dart.library.js_interop) 'heic_to_png_jpg_web.dart' as implementation;
-import 'exceptions.dart';
 import 'heic_image_info.dart';
 import 'heic_conversion_task.dart';
 import 'platform_interface.dart';
@@ -38,15 +33,10 @@ class HeicConverter {
   /// Returns basic metadata about a HEIC image.
   ///
   /// On mobile/desktop the `image` package decodes the image to read dimensions.
+  /// On web, the libheif-js decoder is used directly.
   static Future<HeicImageInfo> getImageInfo(Uint8List heicData) async {
-    final result = await Isolate.run(() {
-      final image = img.decodeImage(heicData);
-      if (image == null) {
-        throw const ConversionFailedException('Failed to decode HEIC image for info');
-      }
-      return (width: image.width, height: image.height);
-    });
-    return HeicImageInfo(width: result.width, height: result.height);
+    HeicToImagePlatform.instance = _platform;
+    return HeicToImagePlatform.instance.getImageInfo(heicData);
   }
 
   /// Converts [heicData] to JPG.
@@ -166,7 +156,7 @@ class HeicConverter {
   /// If [outputPath] is not provided, a unique path in the system temp
   /// directory is used.
   ///
-  /// Throws [UnsupportedError] on web (no file system access).
+  /// Throws [PlatformNotSupportedException] on web (no file system access).
   static Future<String> convertFile({
     required String inputPath,
     String? outputPath,
@@ -175,28 +165,14 @@ class HeicConverter {
     int? maxWidth,
     int? maxHeight,
   }) async {
-    // dart:io is unavailable on web — this check is compile-time safe because
-    // this method is only meaningful on non-web targets.
-    final heicData = await File(inputPath).readAsBytes();
-
-    final outputData = await convertToImage(
-      heicData: heicData,
+    HeicToImagePlatform.instance = _platform;
+    return HeicToImagePlatform.instance.convertFile(
+      inputPath: inputPath,
+      outputPath: outputPath,
       format: format,
       quality: quality,
       maxWidth: maxWidth,
       maxHeight: maxHeight,
     );
-
-    final String resolvedOutputPath;
-    if (outputPath != null) {
-      resolvedOutputPath = outputPath;
-    } else {
-      final tempDir = await getTemporaryDirectory();
-      final id = DateTime.now().microsecondsSinceEpoch;
-      resolvedOutputPath = '${tempDir.path}/heic_$id.${format.name}';
-    }
-
-    await File(resolvedOutputPath).writeAsBytes(outputData);
-    return resolvedOutputPath;
   }
 }

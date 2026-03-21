@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:heic_to_png_jpg/src/image_format.dart';
+import 'package:heic_to_png_jpg/src/heic_image_info.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 abstract class HeicToImagePlatform extends PlatformInterface {
@@ -30,5 +31,20 @@ abstract class HeicToImagePlatform extends PlatformInterface {
 
     /// To override the default libheif js cdn url.
     String? libheifJsUrl,
+  });
+
+  /// Returns basic metadata about a HEIC image.
+  Future<HeicImageInfo> getImageInfo(Uint8List heicData);
+
+  /// Converts a HEIC file on disk and returns the output file path.
+  ///
+  /// Throws [PlatformNotSupportedException] on platforms without file system access.
+  Future<String> convertFile({
+    required String inputPath,
+    String? outputPath,
+    ImageFormat format = ImageFormat.jpg,
+    int quality = 100,
+    int? maxWidth,
+    int? maxHeight,
   });
 }
