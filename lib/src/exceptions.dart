@@ -9,8 +9,7 @@ class HeicConversionException implements Exception {
 
 /// Thrown when the input data is not a valid HEIC file.
 class InvalidHeicDataException extends HeicConversionException {
-  const InvalidHeicDataException([String message = 'Invalid HEIC data'])
-      : super(message);
+  const InvalidHeicDataException([super.message = 'Invalid HEIC data']);
 }
 
 /// Thrown when conversion fails due to an encoding/decoding error.

@@ -31,7 +31,7 @@ A Flutter package to convert HEIC images to PNG, JPG, or WebP on mobile, web, an
 
 ```yaml
 dependencies:
-  heic_to_png_jpg: ^0.1.0
+  heic_to_png_jpg: ^0.1.2
 ```
 
 ```bash
@@ -169,6 +169,12 @@ final png = await HeicConverter.convertToPNG(
 | Must read file manually | `HeicConverter.convertFile(inputPath: ...)` |
 
 The core API (`convertToJPG`, `convertToPNG`, `convertToImage`, `maxWidth`, `quality`, `libheifJsUrl`) is **fully backward compatible**.
+
+## Requirements
+
+- **Flutter:** 3.24.0 or later
+- **iOS:** 12.0 or later
+- **Android:** API 21 (Lollipop) or later
 
 ## Notes
 

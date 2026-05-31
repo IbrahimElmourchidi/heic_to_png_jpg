@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.2] - 2026-05-31
+
+### Fixed
+- Bump `heif_converter` dependency to `^1.0.6` — adds Swift Package Manager (SPM)
+  support on iOS, silencing Flutter's *"plugins do not support Swift Package Manager"*
+  warning that appeared on Flutter 3.24+.
+- Minimum iOS deployment target is now **12.0** (transitive requirement from
+  `heif_converter` 1.0.3+; iOS 11 is no longer supported).
+- Raise Flutter SDK floor to `>=3.24.0` to match stable SPM support.
+
+### Changed
+- Bump `flutter_lints` dev dependency to `^5.0.0` (was `^2.0.1`).
+- Refresh lockfile to latest within-constraint versions of all transitive
+  dependencies (`image` 4.5.4 → 4.9.1, `path_provider_android` 2.2.17 → 2.3.1,
+  `path_provider_foundation` 2.4.1 → 2.6.0, `archive`, `crypto`, `ffi`, `xml`,
+  and others). No API changes; bug-fix and performance improvements only.
+- Apply `use_super_parameters` to `InvalidHeicDataException`.
+- Remove unnecessary `library` directive from `lib/heic_to_png_jpg.dart`.
+
 ## [0.1.1] - 2026-03-21
 - fixed the documentation comments
 
